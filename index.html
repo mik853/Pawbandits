@@ -237,7 +237,7 @@ body::after{
 .fl{
   display:block;font-family:'Courier Prime',monospace;
   font-size:clamp(9px,2.3vw,11px);
-  color:rgba(220,220,220,0.9);letter-spacing:0.38em;
+  color:#2a2a2a;letter-spacing:0.38em;
   text-transform:uppercase;margin-bottom:7px;
 }
 .fi{
@@ -431,8 +431,8 @@ textarea.fi{resize:none;height:88px;line-height:1.5}
         <a href="https://x.com/pawbandits" class="go-btn" target="_blank">GO</a>
       </div>
       <div class="task-row">
-        <span class="task-txt">3. Join the Discord</span>
-        <a href="#" class="go-btn">GO</a>
+        <span class="task-txt">3. Like &amp; RT the pinned</span>
+        <a href="PINNED_TWEET_URL_HERE" class="go-btn" target="_blank">GO</a>
       </div>
     </div>
     <button class="next-btn" onclick="document.getElementById('page3').scrollIntoView({behavior:'smooth'})">NEXT</button>
@@ -479,15 +479,35 @@ textarea.fi{resize:none;height:88px;line-height:1.5}
 </a>
 
 <script>
-function handleSubmit(){
+const SHEET_URL = 'YOUR_APPS_SCRIPT_DEPLOYMENT_URL_HERE';
+
+async function handleSubmit(){
   const w=document.getElementById('wallet').value.trim();
   const t=document.getElementById('twitter').value.trim();
+  const r=document.getElementById('reason').value.trim();
   let ok=true;
   if(!w){shake('wallet');ok=false}
   if(!t){shake('twitter');ok=false}
   if(!ok) return;
-  document.getElementById('form-fields').style.display='none';
-  document.getElementById('succ').style.display='block';
+
+  const btn=document.querySelector('.sub-btn');
+  btn.textContent='SENDING...';
+  btn.disabled=true;
+
+  try{
+    await fetch(SHEET_URL,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({wallet:w,twitter:t,reason:r})
+    });
+    document.getElementById('form-fields').style.display='none';
+    document.getElementById('succ').style.display='block';
+  } catch(e){
+    btn.textContent='SUBMIT';
+    btn.disabled=false;
+    alert('Something went wrong. Please try again.');
+  }
 }
 function shake(id){
   const el=document.getElementById(id);
